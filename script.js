@@ -9,12 +9,16 @@ let btn = document.querySelector("#btn"),
 
 btn.addEventListener("click", function () {
   fetch(url)
+    .then(handleErrors)
     .then(parseJSON)
     .then(updateProfile)
-    .catch(function (err) {
-      console.log(err);
-    });
+    .catch(displayErrors);
 });
+
+function displayErrors(err) {
+  console.log("INSIDE displayErrors!");
+  console.log(err);
+}
 
 function parseJSON(res) {
   return res.json().then(function (parsedData) {
@@ -23,10 +27,17 @@ function parseJSON(res) {
 }
 
 function updateProfile(data) {
-  let fullName = data.name.first + " " + data.name.last;
+  let fullName = `${data.name.first} ${data.name.last}`;
   fullNameDisp.innerHTML = fullName;
   avatar.src = data.picture.medium;
   username.innerText = data.login.username;
   city.innerText = data.location.city;
   email.innerText = data.email;
+}
+
+function handleErrors(res) {
+  if (!res.ok) {
+    throw Error(res.status);
+  }
+  return res;
 }
